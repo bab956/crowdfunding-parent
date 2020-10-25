@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <!--mybatis提供整合spring的SQLSessionFactoryBean-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--这里可以直接引用dataSource，在没组合使用前会报错，组合使用时就可以自动在ioc找到dataSource了-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--指定mybatis全局配置文件路径-->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <!--
+            mapper映射文件路径是在项目中的mybatis/mapper/*.xml，所以需要自己指定扫描路径
+            main项目扫描时可以扫描到自己依赖的jar包的类路径下的内容，在classpath加个*就会把其依赖的jar都扫描一遍
+        -->
+        <property name="mapperLocations" value="classpath*:xyz/newtouch/crowdfunding/mapper/*.xml"/>
+
+        <!--分页工具-->
+        <!--https://pagehelper.github.io/-->
+        <property name="plugins">
+            <bean class="com.github.pagehelper.PageInterceptor">
+                <property name="properties">
+                    <!--分页合理化 -->
+                    <value>reasonable=true</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!--
+        mapper接口扫描路径
+        用于建立绑定关系：映射文件和mapper接口绑定，namespace和接口名绑定，方法名和标签id绑定
+    -->
+    <mybatis:scan base-package="xyz.newtouch.crowdfunding.mapper"/>
+</beans>

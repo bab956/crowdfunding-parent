@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--数据库事务相关配置-->
+    <!--引入外部属性配置文件jdbc.properties-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--数据库连接池-->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="url" value="${datasource.url}"/>
+        <property name="driverClassName" value="${datasource.driverClassName}"/>
+        <property name="username" value="${datasource.user}"/>
+        <property name="password" value="${datasource.password}"/>
+        <property name="initialSize" value="${datasource.initialSize}"/>
+        <property name="maxActive" value="${datasource.maxActive}"/>
+    </bean>
+
+    <!--事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <!-- 必须引用当前连接的数据库连接池,因为事务需要在同一个connection中否则无法有效的进行管理 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--事务的注解驱动(需要事务管控时需要自行添加@Transactional注解)，默认查找的就是transactionManager可以省略transaction-manager属性-->
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <!--为了省事，这里使用xml形式来引入事务-->
+    <!--配置xml形式的事务管理器,advice:指向事务管理器，如果名称是transactionManager可以省略transaction-manager属性-->
+    <tx:advice transaction-manager="transactionManager" id="tx_xml_advice">
+        <!--事务的属性-->
+        <tx:attributes>
+            <!--匹配的优先级：精确匹配 -> 半模糊匹配 -> 模糊匹配-->
+            <!--精确匹配-->
+            <tx:method name="multiTransaction" propagation="REQUIRED"/>
+            <!--模糊匹配所有update开头的方法，REQUIRED是默认的属性不写也可以-->
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <!--全模糊匹配(配置时从上到下执行的，上面都不满足的情况下，执行下面的操作),下面匹配到的都是查询操作-->
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--将事务引入到切入点-->
+    <aop:config>
+        <!--配置切入点(指定哪些类中的方法需要进行事务的管控),注意配置的路径，如果路径不正确将不会生效，最后两个“*”一个是所有类 一个是所有方法-->
+        <aop:advisor advice-ref="tx_xml_advice" pointcut="execution(* xyz..service.*.*(..))"/>
+    </aop:config>
+</beans>

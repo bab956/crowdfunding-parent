@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--
+        targetRuntime 表示你要生成的版本，常用选项如下：
+            MyBatis3				豪华版本
+            MyBatis3Simple			CRUD标准版
+     -->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+
+        <!--去掉全部的注释，注意此标签必须在jdbcConnection之前 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <!--mysql连接信息-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/crowdfunding?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <!--
+        是否使用大类型
+            int -> BigInteger
+            double -> BigDecimals
+        -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--
+            javaModelGenerator配置生成模型JavaBean
+                targetPackage生成的JavaBean的包名
+                targetProject生成之后在哪个工程目录下,从当前项目模块开始算，直至需要生成的包路径
+         -->
+        <javaModelGenerator targetPackage="xyz.newtouch.crowdfunding.pojo" targetProject="..\crowdfunding-common\src\main\java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--
+            sqlMapGenerator生成sql的mapper.xml配置文件
+                targetPackage生成mapper.xml配置文件放的包名,从当前项目模块开始算，直至需要生成的包路径
+         -->
+        <sqlMapGenerator targetPackage="xyz.newtouch.crowdfunding.mapper" targetProject="src\main\resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!-- javaClientGenerator配置生成的Mapper接口 -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="xyz.newtouch.crowdfunding.mapper" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 表信息，一个table标签，表示一个表，domainObjectName代表的是生成后的JavaBean名称-->
+        <!--<table tableName="t_book" domainObjectName="Book"/>-->
+        <!--使用通配模式，生成的JavaBean默认驼峰命名-->
+        <table tableName="%" schema=""/>
+    </context>
+</generatorConfiguration>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--整合时不直接在mybatis核心配置文件中加载相关环境，而是通过mybatis提供整合spring的SqlSessionFactoryBean在spring核心配置文件中完成配置与加载-->
+<configuration>
+    <settings>
+        <!-- 打开延迟加载的开关 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 将积极加载改为消极加载,按需加载(分步查询时，不会查询不相干的数据) -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+    <!-- 也不需要在mybatis配置文件中指定Mapper.xml的路径，统一到spring配置中指定 -->
+    <!--分页插件，已经在spring的配置文件中进行了整合，无需单独在mybatis配置文件中进行配置-->
+    <!--<plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            &lt;!&ndash;启用分页合理化&ndash;&gt;
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>-->
+</configuration>
